@@ -12,15 +12,15 @@ const middlewares = require('./middlewares');
 const api = require('./api');
 
 const app = express();
-app.use('/api/v1', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api/v1/openapi', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(morgan('dev'));
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/v1', api);
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(middlewares.notFound);
 app.use(middlewares.errorHandler);

@@ -1,25 +1,21 @@
 const request = require('supertest');
+const { expect } = require('chai');
 
 const app = require('../src/app');
 
-describe('GET /api/v1', () => {
+describe('POST /api/v1/login', async () => {
   it('responds with a json message', (done) => {
     request(app)
-      .get('/api/v1')
+      .post('/api/v1/login')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
-      .expect(200, {
-        message: 'API - 👋🌎🌍🌏'
-      }, done);
-  });
-});
-
-describe('GET /api/v1/emojis', () => {
-  it('responds with a json message', (done) => {
-    request(app)
-      .get('/api/v1/emojis')
-      .set('Accept', 'application/json')
-      .expect('Content-Type', /json/)
-      .expect(200, ['😀', '😳', '🙄'], done);
+      .expect(200)
+      .then(response => {
+        expect(response.body.type, 'Bearer');
+        expect(response.body.token.length > 1, true);
+        done()
+      }).catch((error) => {
+        done(error)
+      })
   });
 });
