@@ -1,0 +1,351 @@
+---
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: DARE Node.js API REST assessment
+servers:
+  - url: http://localhost:3000/api/v1
+  - url: https://dare-nodejs-assessment.herokuapp.com/api
+paths:
+  "/login":
+    post:
+      tags:
+        - auth
+      summary: Retrieve the auth token
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description:
+            Return a valid Bearer access token for the valid client_credentials
+            provided. The token has a time to live equal to expires_in
+          content:
+            application/json:
+              schema:
+                required:
+                  - token
+                  - type
+                  - expires_in
+                properties:
+                  token:
+                    type: string
+                  type:
+                    type: string
+                  expires_in:
+                    type: integer
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+        "401":
+          description: Unauthorized error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+  "/policies":
+    summary: Get the list of policies' client
+    get:
+      tags:
+        - policies
+      summary:
+        Get the list of policies' client paginated and limited to 10 elements
+        by default.
+      description:
+        Can be accessed by client with role user (it will retrieve its
+        own policies) and admin (it will retrieve all the policies)
+      operationId: findPolicies
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            properties:
+              limit:
+                type: integer
+      responses:
+        "200":
+          description: List of policies' client
+          content:
+            application/json:
+              schema:
+                items:
+                  properties:
+                    id:
+                      type: string
+                    amountInsured:
+                      type: string
+                    email:
+                      type: string
+                    inceptionDate:
+                      type: string
+                    installmentPayment:
+                      type: boolean
+        "401":
+          description: Unauthorized error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+  "/policies/:id":
+    summary: Get the details of a policy's client
+    get:
+      tags:
+        - policies
+      summary: Get the details of a policy's client
+      description:
+        Can be accessed by client with role user (it will retrieve its
+        own policy) and admin (it will retrieve all the policies)
+      operationId: findByIdPolicies
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: params
+          name: id
+          schema:
+            properties:
+              id:
+                type: string
+      responses:
+        "200":
+          description: Get the details of a policy's client
+          content:
+            application/json:
+              schema:
+                id:
+                  type: string
+                amountInsured:
+                  type: string
+                email:
+                  type: string
+                inceptionDate:
+                  type: string
+                installmentPayment:
+                  type: boolean
+        "401":
+          description: Unauthorized error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+        "403":
+          description: Forbidden error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+        "404":
+          description: Not Found error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+  "/clients":
+    summary: Get the list of clients details
+    get:
+      tags:
+        - clients
+      summary:
+        Get the list of clients details paginated and limited to 10 elements
+        by default. This API endpoint access also an optional filter query to filter
+        by client name.
+      description:
+        Can be accessed by client with role user (it will retrieve its
+        own client details as only element of the list) and admin (it will retrieve
+        all the clients list)
+      operationId: findClients
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            properties:
+              limit:
+                type: integer
+        - in: query
+          name: name
+          schema:
+            properties:
+              limit:
+                type: string
+      responses:
+        "200":
+          description: List of clients details
+          content:
+            application/json:
+              schema:
+                items:
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    email:
+                      type: string
+                    role:
+                      type: string
+                    policies:
+                      items:
+                        properties:
+                          id:
+                            type: string
+                          amountInsured:
+                            type: string
+                          inceptionDate:
+                            type: string
+        "401":
+          description: Unauthorized error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+  "/clients/:id":
+    summary: Get the client's details
+    get:
+      tags:
+        - clients
+      summary: Get the client's details
+      description:
+        Can be accessed by client with role user (it will retrieve its
+        own client details) and admin (it will retrieve any client details)
+      operationId: findByIdClients
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: params
+          name: id
+          schema:
+            properties:
+              id:
+                type: string
+      responses:
+        "200":
+          description: Client's details
+          content:
+            application/json:
+              schema:
+                items:
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    email:
+                      type: string
+                    role:
+                      type: string
+                    policies:
+                      items:
+                        properties:
+                          id:
+                            type: string
+                          amountInsured:
+                            type: string
+                          inceptionDate:
+                            type: string
+        "401":
+          description: Unauthorized error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+        "403":
+          description: Forbidden error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+        "404":
+          description: Not Found error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+  "/clients/:id/policies":
+    summary: Get the client's policies
+    get:
+      tags:
+        - clients
+      summary: Get the client's policies
+      description:
+        Can be accessed by client with role user (it will retrieve its
+        own client policy list) and admin (it will retrieve any client policy list)
+      operationId: findPoliciesByClientId
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: params
+          name: id
+          schema:
+            properties:
+              id:
+                type: string
+      responses:
+        "200":
+          description: Client's policies
+          content:
+            application/json:
+              schema:
+                items:
+                  properties:
+                    id:
+                      type: string
+                    amountInsured:
+                      type: string
+                    email:
+                      type: string
+                    inceptionDate:
+                      type: string
+                    installmentPayment:
+                      type: boolean
+        "401":
+          description: Unauthorized error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+        "403":
+          description: Forbidden error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+        "404":
+          description: Not Found error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
