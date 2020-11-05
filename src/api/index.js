@@ -1,15 +1,29 @@
 const express = require('express');
+const NodeCache = require('node-cache');
+const apiHelper = require('../helpers/ApiClient');
 
-const emojis = require('./emojis');
+const xhr = require('../helpers/XHR');
 
 const router = express.Router();
+const cache = new NodeCache();
 
-router.get('/', (req, res) => {
+router.post('/login', async (req, res) => {
+  const token = await apiHelper.login(cache, xhr);
   res.json({
-    message: 'API - 👋🌎🌍🌏'
+    token,
+    type: 'Bearer'
   });
 });
 
-router.use('/emojis', emojis);
+router.get('/clients', async (req, res, next) => {
+  try {
+    const { limit, name } = req.query;
+    const data = await apiHelper.loadData('/clients', cache, xhr);
+    const result = name ? data.filter((client) => client.name === name) : data;
+    return res.status(200).json({ clients: result.slice(0, limit) });
+  } catch (error) {
+    return next(error);
+  }
+});
 
 module.exports = router;

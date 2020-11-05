@@ -1,5 +1,5 @@
 {
-  "name": "express-api-starter",
+  "name": "insurance-api-middleware",
   "version": "1.2.0",
   "description": " A basic starter for an express.js API",
   "main": "index.js",
@@ -7,7 +7,7 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "lint": "eslint --fix src",
-    "test": "mocha --exit"
+    "test": "mocha **/*.spec.js --timeout 50000 --exit"
   },
   "keywords": [],
   "author": "CJ R. <cj@null.computer> (https://w3cj.now.sh)",
@@ -22,15 +22,18 @@
     "express": "^4.17.1",
     "helmet": "^4.1.0",
     "morgan": "^1.10.0",
+    "node-cache": "^5.1.2",
+    "node-fetch": "^2.6.1",
+    "sinon": "^9.2.1",
     "swagger-ui-express": "^4.1.4",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
     "eslint": "^7.7.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0",
     "mocha": "^8.1.2",
-    "nodemon": "^2.0.4",
-    "supertest": "^4.0.2"
+    "nodemon": "^2.0.4"
   }
 }
