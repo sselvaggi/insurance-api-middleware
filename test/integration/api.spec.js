@@ -7,6 +7,7 @@ const FAKE_SERVER = require('../fixtures/server');
 const clients = require('../fixtures/clients');
 
 const PORT = process.env.PORT || 3000;
+const CLIENT_ID = clients.body[1].id;
 
 const BASE_URL = `http://localhost:${PORT}`;
 
@@ -44,10 +45,22 @@ describe('POST /api/v1/login', () => {
 
   it('responds with a list of clients', async () => {
     try {
-      const response = await (await fetch(`${BASE_URL}/api/v1/clients?limit=1`, {
+      const response = await (await fetch(`${BASE_URL}/api/v1/clients?limit=10`, {
         method: 'get'
       })).json();
+      assert.deepStrictEqual(response.clients.length, 10);
       assert.deepStrictEqual(response.clients[0], clients.body[0]);
+    } catch (error) {
+      assert.fail(error);
+    }
+  });
+
+  it('responds with a client', async () => {
+    try {
+      const response = await (await fetch(`${BASE_URL}/api/v1/clients/${CLIENT_ID}`, {
+        method: 'get'
+      })).json();
+      assert.deepStrictEqual(response.client, clients.body[1]);
     } catch (error) {
       assert.fail(error);
     }
