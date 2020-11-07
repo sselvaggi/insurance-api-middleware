@@ -6,7 +6,7 @@ const FAKE_SERVER = require('../fixtures/server');
 const XHR = require('../../src/helpers/XHR');
 const helper = require('../../src/helpers/ApiClient');
 const xhr = require('../../src/helpers/XHR');
-const clients = require('../fixtures/clients')
+const clients = require('../fixtures/clients');
 
 describe('helpers/insuranceApiClient', () => {
   // eslint-disable-next-line no-undef

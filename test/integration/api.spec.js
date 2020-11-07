@@ -1,9 +1,11 @@
 const fetch = require('node-fetch');
 const assert = require('assert');
 const sinon = require('sinon');
+const jwt = require('jsonwebtoken');
 const app = require('../../src/app');
 const XHR = require('../../src/helpers/XHR');
 const FAKE_SERVER = require('../fixtures/server');
+const login = require('../helpers/login');
 const clients = require('../fixtures/clients');
 
 const PORT = process.env.PORT || 3000;
@@ -13,7 +15,7 @@ const BASE_URL = `http://localhost:${PORT}`;
 
 describe('POST /api/v1/login', () => {
   // eslint-disable-next-line no-undef
-  before(() => {
+  before(async () => {
     app.listen(PORT, () => {});
     sinon.stub(XHR, 'invoke').callsFake(
       /**
@@ -28,16 +30,16 @@ describe('POST /api/v1/login', () => {
 
   // eslint-disable-next-line no-undef
   after(() => {
-    // app.close();
     sinon.restore();
   });
 
   it('responds with a json token', async () => {
     try {
-      const response = await (await fetch(`${BASE_URL}/api/v1/login`, {
-        method: 'post'
-      })).json();
-      assert.deepStrictEqual(response.token, '1234');
+      const token = await login(BASE_URL);
+      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, data) => {
+        if (error) assert.fail(error);
+        assert.deepStrictEqual(data, 'public-api');
+      });
     } catch (error) {
       assert.fail(error);
     }
@@ -45,11 +47,15 @@ describe('POST /api/v1/login', () => {
 
   it('responds with a list of clients', async () => {
     try {
+      const token = await login(BASE_URL);
       const response = await (await fetch(`${BASE_URL}/api/v1/clients?limit=10`, {
-        method: 'get'
+        method: 'get',
+        headers: {
+          authorization: `Bearer ${token}`
+        }
       })).json();
       assert.deepStrictEqual(response.clients.length, 10);
-      assert.deepStrictEqual(response.clients[0], clients.body[0]);
+      assert.deepStrictEqual(response.clients, clients.body.slice(0, 10));
     } catch (error) {
       assert.fail(error);
     }
@@ -57,8 +63,12 @@ describe('POST /api/v1/login', () => {
 
   it('responds with a client', async () => {
     try {
+      const token = await login(BASE_URL);
       const response = await (await fetch(`${BASE_URL}/api/v1/clients/${CLIENT_ID}`, {
-        method: 'get'
+        method: 'get',
+        headers: {
+          authorization: `Bearer ${token}`
+        }
       })).json();
       assert.deepStrictEqual(response.client, clients.body[1]);
     } catch (error) {
