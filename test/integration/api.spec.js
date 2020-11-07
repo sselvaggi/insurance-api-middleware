@@ -45,10 +45,10 @@ describe('POST /api/v1/login', () => {
     }
   });
 
-  it('responds with a list of clients', async () => {
+  it('responds with a list of 10 clients', async () => {
     try {
       const token = await login(BASE_URL);
-      const response = await (await fetch(`${BASE_URL}/api/v1/clients?limit=10`, {
+      const response = await (await fetch(`${BASE_URL}/api/v1/clients`, {
         method: 'get',
         headers: {
           authorization: `Bearer ${token}`
@@ -56,6 +56,38 @@ describe('POST /api/v1/login', () => {
       })).json();
       assert.deepStrictEqual(response.clients.length, 10);
       assert.deepStrictEqual(response.clients, clients.body.slice(0, 10));
+    } catch (error) {
+      assert.fail(error);
+    }
+  });
+
+  it('responds with a list of 50 clients', async () => {
+    try {
+      const token = await login(BASE_URL);
+      const response = await (await fetch(`${BASE_URL}/api/v1/clients?limit=50`, {
+        method: 'get',
+        headers: {
+          authorization: `Bearer ${token}`
+        }
+      })).json();
+      assert.deepStrictEqual(response.clients.length, 50);
+      assert.deepStrictEqual(response.clients, clients.body.slice(0, 50));
+    } catch (error) {
+      assert.fail(error);
+    }
+  });
+
+  it('responds with a list of 50 clients', async () => {
+    try {
+      const token = await login(BASE_URL);
+      const response = await (await fetch(`${BASE_URL}/api/v1/clients?limit=50&page=2`, {
+        method: 'get',
+        headers: {
+          authorization: `Bearer ${token}`
+        }
+      })).json();
+      assert.deepStrictEqual(response.clients.length, 50);
+      assert.deepStrictEqual(response.clients, clients.body.slice(50, 100));
     } catch (error) {
       assert.fail(error);
     }

@@ -26,13 +26,13 @@ router.post('/login', async (req, res) => {
 
 router.get('/clients', jwtCheck, async (req, res, next) => {
   try {
-    const { limit, name } = req.query;
+    const { limit = 10, name, page = 1 } = req.query;
     let clients = await apiHelper.loadData('/clients', cache, xhr);
     if (name) {
       clients = clients.filter((client) => client.name === name);
     }
     if (limit && clients.length > limit) {
-      clients = clients.slice(0, limit);
+      clients = clients.slice(limit * (page - 1), limit * page);
     }
     return res.status(200).json({ clients });
   } catch (error) {
