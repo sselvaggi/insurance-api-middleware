@@ -61,6 +61,21 @@ describe('POST /api/v1/login', () => {
     }
   });
 
+  it('responds with a list of clients named Johns', async () => {
+    try {
+      const token = await login(BASE_URL);
+      const response = await (await fetch(`${BASE_URL}/api/v1/clients?name=Johns`, {
+        method: 'get',
+        headers: {
+          authorization: `Bearer ${token}`
+        }
+      })).json();
+      assert.deepStrictEqual(response.clients[0].name, 'Johns');
+    } catch (error) {
+      assert.fail(error);
+    }
+  });
+
   it('responds with a client', async () => {
     try {
       const token = await login(BASE_URL);
