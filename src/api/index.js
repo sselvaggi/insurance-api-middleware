@@ -70,4 +70,16 @@ router.get('/policies', jwtCheck, async (req, res, next) => {
   }
 });
 
+router.get('/policies/:id', jwtCheck, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const data = await apiHelper.loadData('/policies', cache, xhr);
+    return res.status(ResponseCodes.OK).json({
+      policy: data.find((policy) => policy.id === id)
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 module.exports = router;

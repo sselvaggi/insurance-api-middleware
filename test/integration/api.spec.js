@@ -13,6 +13,7 @@ const policies = require('../fixtures/policies');
 
 const PORT = process.env.PORT || 3000;
 const CLIENT_ID = clients.body[1].id;
+const POLICY_ID = policies.body[1].id;
 
 const BASE_URL = `http://localhost:${PORT}`;
 const REST_METHODS = [Methods.GET, Methods.POST, Methods.PUT, Methods.DELETE];
@@ -181,6 +182,22 @@ describe('API Test', () => {
       }));
       assert.deepStrictEqual(response.data.policies.length, 50);
       assert.deepStrictEqual(response.data.policies, policies.body.slice(50, 100));
+    } catch (error) {
+      assert.fail(error);
+    }
+  });
+
+  it('responds with a policy', async () => {
+    try {
+      const token = await login(BASE_URL);
+      const response = /** @type {Insurance.PolicyResponse} */ (await axios({
+        url: `${BASE_URL}/api/v1/policies/${POLICY_ID}`,
+        method: Methods.GET,
+        headers: {
+          authorization: `Bearer ${token}`
+        }
+      }));
+      assert.deepStrictEqual(response.data.policy, policies.body[1]);
     } catch (error) {
       assert.fail(error);
     }
