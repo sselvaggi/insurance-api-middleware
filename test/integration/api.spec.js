@@ -1,7 +1,9 @@
-const fetch = require('node-fetch');
+/// <reference path="../../index.d.ts" />
+const axios = require('axios');
 const assert = require('assert');
 const sinon = require('sinon');
 const jwt = require('jsonwebtoken');
+const { Methods } = require('http-headers-js');
 const app = require('../../src/app');
 const XHR = require('../../src/helpers/XHR');
 const FAKE_SERVER = require('../fixtures/server');
@@ -12,8 +14,9 @@ const PORT = process.env.PORT || 3000;
 const CLIENT_ID = clients.body[1].id;
 
 const BASE_URL = `http://localhost:${PORT}`;
+const REST_METHODS = [Methods.GET, Methods.POST, Methods.PUT, Methods.DELETE];
 
-describe('POST /api/v1/login', () => {
+describe('API Test', () => {
   // eslint-disable-next-line no-undef
   before(async () => {
     app.listen(PORT, () => {});
@@ -24,7 +27,10 @@ describe('POST /api/v1/login', () => {
        * @param {*} headers
        * @param {*} body
        */
-      (method, url) => FAKE_SERVER[url]
+      (method, url) => {
+        if (!REST_METHODS.indexOf(method) === -1) throw new Error('Invalid http method', method);
+        return FAKE_SERVER[url];
+      }
     );
   });
 
@@ -38,7 +44,7 @@ describe('POST /api/v1/login', () => {
       const token = await login(BASE_URL);
       jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, data) => {
         if (error) assert.fail(error);
-        assert.deepStrictEqual(data, 'public-api');
+        assert.deepStrictEqual(data.user, 'public-api');
       });
     } catch (error) {
       assert.fail(error);
@@ -48,46 +54,49 @@ describe('POST /api/v1/login', () => {
   it('responds with a list of 10 clients', async () => {
     try {
       const token = await login(BASE_URL);
-      const response = await (await fetch(`${BASE_URL}/api/v1/clients`, {
-        method: 'get',
+      const response = /** @type {Insurance.ClientListResponse} */ (await axios({
+        url: `${BASE_URL}/api/v1/clients`,
+        method: Methods.GET,
         headers: {
           authorization: `Bearer ${token}`
         }
-      })).json();
-      assert.deepStrictEqual(response.clients.length, 10);
-      assert.deepStrictEqual(response.clients, clients.body.slice(0, 10));
+      }));
+      assert.deepStrictEqual(response.data.clients.length, 10);
+      assert.deepStrictEqual(response.data.clients, clients.body.slice(0, 10));
     } catch (error) {
       assert.fail(error);
     }
   });
 
-  it('responds with a list of 50 clients', async () => {
+  it('responds with a list of 50 clients page 1', async () => {
     try {
       const token = await login(BASE_URL);
-      const response = await (await fetch(`${BASE_URL}/api/v1/clients?limit=50`, {
-        method: 'get',
+      const response = /** @type {Insurance.ClientListResponse} */ (await axios({
+        url: `${BASE_URL}/api/v1/clients?limit=50`,
+        method: Methods.GET,
         headers: {
           authorization: `Bearer ${token}`
         }
-      })).json();
-      assert.deepStrictEqual(response.clients.length, 50);
-      assert.deepStrictEqual(response.clients, clients.body.slice(0, 50));
+      }));
+      assert.deepStrictEqual(response.data.clients.length, 50);
+      assert.deepStrictEqual(response.data.clients, clients.body.slice(0, 50));
     } catch (error) {
       assert.fail(error);
     }
   });
 
-  it('responds with a list of 50 clients', async () => {
+  it('responds with a list of 50 clients page 2', async () => {
     try {
       const token = await login(BASE_URL);
-      const response = await (await fetch(`${BASE_URL}/api/v1/clients?limit=50&page=2`, {
-        method: 'get',
+      const response = /** @type {Insurance.ClientListResponse} */ (await axios({
+        url: `${BASE_URL}/api/v1/clients?limit=50&page=2`,
+        method: Methods.GET,
         headers: {
           authorization: `Bearer ${token}`
         }
-      })).json();
-      assert.deepStrictEqual(response.clients.length, 50);
-      assert.deepStrictEqual(response.clients, clients.body.slice(50, 100));
+      }));
+      assert.deepStrictEqual(response.data.clients.length, 50);
+      assert.deepStrictEqual(response.data.clients, clients.body.slice(50, 100));
     } catch (error) {
       assert.fail(error);
     }
@@ -96,13 +105,14 @@ describe('POST /api/v1/login', () => {
   it('responds with a list of clients named Johns', async () => {
     try {
       const token = await login(BASE_URL);
-      const response = await (await fetch(`${BASE_URL}/api/v1/clients?name=Johns`, {
-        method: 'get',
+      const response = /** @type {Insurance.ClientListResponse} */ (await axios({
+        url: `${BASE_URL}/api/v1/clients?name=Johns`,
+        method: Methods.GET,
         headers: {
           authorization: `Bearer ${token}`
         }
-      })).json();
-      assert.deepStrictEqual(response.clients[0].name, 'Johns');
+      }));
+      assert.deepStrictEqual(response.data.clients[0].name, 'Johns');
     } catch (error) {
       assert.fail(error);
     }
@@ -111,13 +121,14 @@ describe('POST /api/v1/login', () => {
   it('responds with a client', async () => {
     try {
       const token = await login(BASE_URL);
-      const response = await (await fetch(`${BASE_URL}/api/v1/clients/${CLIENT_ID}`, {
-        method: 'get',
+      const response = /** @type {Insurance.ClientResponse} */ (await axios({
+        url: `${BASE_URL}/api/v1/clients/${CLIENT_ID}`,
+        method: Methods.GET,
         headers: {
           authorization: `Bearer ${token}`
         }
-      })).json();
-      assert.deepStrictEqual(response.client, clients.body[1]);
+      }));
+      assert.deepStrictEqual(response.data.client, clients.body[1]);
     } catch (error) {
       assert.fail(error);
     }

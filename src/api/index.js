@@ -1,26 +1,26 @@
+/// <reference path="../../index.d.ts" />
 const express = require('express');
 const NodeCache = require('node-cache');
 const jwt = require('jsonwebtoken');
+const { ResponseCodes } = require('http-headers-js');
 const apiHelper = require('../helpers/ApiClient');
 const jwtCheck = require('../middlewares/JwtCheck');
 const xhr = require('../helpers/XHR');
 
+const { PUBLIC_API_ID, PUBLIC_API_SECRET, ACCESS_TOKEN_SECRET } = process.env;
 const router = express.Router();
 const cache = new NodeCache();
 
 router.post('/login', async (req, res) => {
-  const { client_id, client_secret } = req.body;
+  const { username, password } = req.body;
   try {
-    if (
-      client_id === process.env.PUBLIC_API_ID
-      && client_secret === process.env.PUBLIC_API_SECRET
-    ) {
-      const token = jwt.sign('public-api', process.env.ACCESS_TOKEN_SECRET); // , { expiresIn: '24h' }
-      return res.status(200).json({ token, type: 'Bearer' });
+    if (username === PUBLIC_API_ID && password === PUBLIC_API_SECRET) {
+      const token = jwt.sign({ user: 'public-api' }, ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
+      return res.status(ResponseCodes.OK).json({ token, type: 'Bearer' });
     }
-    return res.sendStatus(403);
+    return res.sendStatus(ResponseCodes.FORBIDDEN);
   } catch (error) {
-    return res.sendStatus(403);
+    return res.sendStatus(ResponseCodes.FORBIDDEN);
   }
 });
 
@@ -28,13 +28,14 @@ router.get('/clients', jwtCheck, async (req, res, next) => {
   try {
     const { limit = 10, name, page = 1 } = req.query;
     let clients = await apiHelper.loadData('/clients', cache, xhr);
+
     if (name) {
       clients = clients.filter((client) => client.name === name);
     }
     if (limit && clients.length > limit) {
       clients = clients.slice(limit * (page - 1), limit * page);
     }
-    return res.status(200).json({ clients });
+    return res.status(ResponseCodes.OK).json({ clients });
   } catch (error) {
     return next(error);
   }
@@ -44,7 +45,7 @@ router.get('/clients/:id', jwtCheck, async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = await apiHelper.loadData('/clients', cache, xhr);
-    return res.status(200).json({
+    return res.status(ResponseCodes.OK).json({
       client: data.find((client) => client.id === id)
     });
   } catch (error) {

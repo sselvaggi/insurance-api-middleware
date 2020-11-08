@@ -4,11 +4,12 @@ module.exports.headers = {
   'content-length': 23042,
   'content-type': 'application/json; charset=utf-8',
   date: 'Fri, 06 Nov 2020 07:18:18 GMT',
-  etag: 'W/"SKM5mZWsPFcjlaUZuAS7n4e09eQ"', 
+  etag: 'W/"SKM5mZWsPFcjlaUZuAS7n4e09eQ"',
   expires: 'Fri, 06 Nov 2020 07:19:18 GMT',
   server: 'Cowboy',
   via: '1.1 vegur'
 };
+
 module.exports.body = [
   {
     id: 'a0ece5db-cd14-4f21-812f-966633e7be86',

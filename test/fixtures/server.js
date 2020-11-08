@@ -1,17 +1,25 @@
+const clients = require('./clients');
 const policies = require('./policies');
 
 module.exports = {
   'https://dare-nodejs-assessment.herokuapp.com/api/clients': {
-    json: policies.body,
-    etag: policies.headers.etag,
+    data: clients.body,
+    headers: clients.headers,
+    status: 200
+  },
+  'https://dare-nodejs-assessment.herokuapp.com/api/policies': {
+    data: policies.body,
+    headers: policies.headers,
     status: 200
   },
   'https://dare-nodejs-assessment.herokuapp.com/api/login': {
-    json: {
+    data: {
       type: 'Bearer',
       token: '1234'
     },
-    etag: null,
+    headers: {
+      etag: null
+    },
     status: 200
   }
 };
