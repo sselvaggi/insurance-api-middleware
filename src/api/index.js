@@ -53,4 +53,21 @@ router.get('/clients/:id', jwtCheck, async (req, res, next) => {
   }
 });
 
+router.get('/policies', jwtCheck, async (req, res, next) => {
+  try {
+    const { limit = 10, name, page = 1 } = req.query;
+    let policies = await apiHelper.loadData('/policies', cache, xhr);
+
+    if (name) {
+      policies = policies.filter((policy) => policy.name === name);
+    }
+    if (limit && policies.length > limit) {
+      policies = policies.slice(limit * (page - 1), limit * page);
+    }
+    return res.status(ResponseCodes.OK).json({ policies });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 module.exports = router;

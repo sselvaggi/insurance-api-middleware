@@ -9,6 +9,7 @@ const XHR = require('../../src/helpers/XHR');
 const FAKE_SERVER = require('../fixtures/server');
 const login = require('../helpers/login');
 const clients = require('../fixtures/clients');
+const policies = require('../fixtures/policies');
 
 const PORT = process.env.PORT || 3000;
 const CLIENT_ID = clients.body[1].id;
@@ -129,6 +130,57 @@ describe('API Test', () => {
         }
       }));
       assert.deepStrictEqual(response.data.client, clients.body[1]);
+    } catch (error) {
+      assert.fail(error);
+    }
+  });
+
+  it('responds with a list of 10 policies', async () => {
+    try {
+      const token = await login(BASE_URL);
+      const response = /** @type {Insurance.PolicyListResponse} */ (await axios({
+        url: `${BASE_URL}/api/v1/policies`,
+        method: Methods.GET,
+        headers: {
+          authorization: `Bearer ${token}`
+        }
+      }));
+      assert.deepStrictEqual(response.data.policies.length, 10);
+      assert.deepStrictEqual(response.data.policies, policies.body.slice(0, 10));
+    } catch (error) {
+      assert.fail(error);
+    }
+  });
+
+  it('responds with a list of 50 policies page 1', async () => {
+    try {
+      const token = await login(BASE_URL);
+      const response = /** @type {Insurance.PolicyListResponse} */ (await axios({
+        url: `${BASE_URL}/api/v1/policies?limit=50`,
+        method: Methods.GET,
+        headers: {
+          authorization: `Bearer ${token}`
+        }
+      }));
+      assert.deepStrictEqual(response.data.policies.length, 50);
+      assert.deepStrictEqual(response.data.policies, policies.body.slice(0, 50));
+    } catch (error) {
+      assert.fail(error);
+    }
+  });
+
+  it('responds with a list of 50 policies page 2', async () => {
+    try {
+      const token = await login(BASE_URL);
+      const response = /** @type {Insurance.PolicyListResponse} */ (await axios({
+        url: `${BASE_URL}/api/v1/policies?limit=50&page=2`,
+        method: Methods.GET,
+        headers: {
+          authorization: `Bearer ${token}`
+        }
+      }));
+      assert.deepStrictEqual(response.data.policies.length, 50);
+      assert.deepStrictEqual(response.data.policies, policies.body.slice(50, 100));
     } catch (error) {
       assert.fail(error);
     }
