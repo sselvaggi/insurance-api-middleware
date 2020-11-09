@@ -158,7 +158,7 @@
                 }
             }
         },
-        "/policies/:id": {
+        "/policies/{id}": {
             "summary": "Get the details of a policy's client",
             "get": {
                 "tags": [
@@ -174,7 +174,7 @@
                 ],
                 "parameters": [
                     {
-                        "in": "params",
+                        "in": "path",
                         "name": "id",
                         "schema": {
                             "properties": {
@@ -335,7 +335,7 @@
                 }
             }
         },
-        "/clients/:id": {
+        "/clients/{id}": {
             "summary": "Get the client's details",
             "get": {
                 "tags": [
@@ -351,7 +351,7 @@
                 ],
                 "parameters": [
                     {
-                        "in": "params",
+                        "in": "path",
                         "name": "id",
                         "schema": {
                             "properties": {
@@ -436,7 +436,7 @@
                 }
             }
         },
-        "/clients/:id/policies": {
+        "/clients/{id}/policies": {
             "summary": "Get the client's policies",
             "get": {
                 "tags": [
@@ -452,7 +452,7 @@
                 ],
                 "parameters": [
                     {
-                        "in": "params",
+                        "in": "path",
                         "name": "id",
                         "schema": {
                             "properties": {

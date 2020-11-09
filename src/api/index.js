@@ -123,8 +123,8 @@ router.get('/policies/:id', jwtCheck,
   async (req, res, next) => {
     try {
       const { id } = req.params;
-      if (req.session.role === 'admin' || req.session.id === id) {
-        const policy = await API.loadPolicieById(id);
+      const policy = /** @type {Insurance.Policy} */ (await API.loadPolicieById(id));
+      if (req.session.role === 'admin' || policy.clientId === req.session.id) {
         return res.status(ResponseCodes.OK).json({ policy });
       }
       return res.sendStatus(ResponseCodes.UNAUTHORIZED);

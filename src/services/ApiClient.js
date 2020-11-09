@@ -93,6 +93,8 @@ module.exports = class ApiClient {
    */
   async loadData(path) {
     try {
+      const absolutePath = path.startsWith(process.env.INSURANCE_API_URL)
+        ? path : process.env.INSURANCE_API_URL + path;
       const headers = {};
       const cached = this.cache.get(path);
       if (cached) {
@@ -106,22 +108,22 @@ module.exports = class ApiClient {
       }
 
       headers.authorization = `Bearer ${this.cache.get('token')}`;
-      let res = await this.xhr.invoke(Methods.GET, process.env.INSURANCE_API_URL + path, headers);
+      let res = await this.xhr.invoke(Methods.GET, absolutePath, headers);
 
       if (retry && res.status === ResponseCodes.UNAUTHORIZED) {
-        res = this.xhr.invoke(Methods.GET, path, headers);
+        res = this.xhr.invoke(Methods.GET, absolutePath, headers);
       }
 
       if (res.status === ResponseCodes.OK) {
-        this.cache.set(path, {
+        this.cache.set(absolutePath, {
           json: res.data,
           etag: res.headers.etag
         });
-        return this.cache.get(path).json;
+        return this.cache.get(absolutePath).json;
       }
 
       if (res.status === ResponseCodes.NOT_MODIFIED) {
-        return this.cache.get(path).json;
+        return this.cache.get(absolutePath).json;
       }
       throw new Error('Unexpected response status', res.status);
     } catch (error) {

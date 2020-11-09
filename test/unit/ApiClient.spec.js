@@ -48,11 +48,12 @@ describe('helpers/insuranceApiClient', () => {
 
   it('should load a list of clients from XHR and save in cache', async () => {
     const cache = new NodeCache();
+    const absolutePath = `${INSURANCE_API_URL}/clients`;
     cache.set('token', '1234');
     const xhrFake = {
       invoke(method, path) {
         assert.strictEqual(method, Methods.GET);
-        assert.strictEqual(path, `${INSURANCE_API_URL}/clients`);
+        assert.strictEqual(path, absolutePath);
         return {
           status: 200,
           data: {
@@ -67,7 +68,7 @@ describe('helpers/insuranceApiClient', () => {
       const API = new ApiClientService(cache, xhrFake);
       const clientsFromApi = (await API.loadClients()).clients;
       assert.deepStrictEqual(clientsFromApi, clients.body);
-      assert.deepStrictEqual(cache.get('/clients').json.clients, clients.body);
+      assert.deepStrictEqual(cache.get(absolutePath).json.clients, clients.body);
     } catch (error) {
       assert.fail(error);
     }
@@ -75,11 +76,12 @@ describe('helpers/insuranceApiClient', () => {
 
   it('should load a list of policies from XHR and save in cache', async () => {
     const cache = new NodeCache();
+    const absolutePath = `${INSURANCE_API_URL}/policies`;
     cache.set('token', '1234');
     const xhrFake = {
       invoke(method, path) {
         assert.strictEqual(method, Methods.GET);
-        assert.strictEqual(path, `${INSURANCE_API_URL}/policies`);
+        assert.strictEqual(path, absolutePath);
         return {
           status: 200,
           data: {
@@ -94,7 +96,7 @@ describe('helpers/insuranceApiClient', () => {
       const API = new ApiClientService(cache, xhrFake);
       const policiesFromApi = (await API.loadPolicies()).policies;
       assert.deepStrictEqual(policiesFromApi, policies.body);
-      assert.deepStrictEqual(cache.get('/policies').json.policies, policies.body);
+      assert.deepStrictEqual(cache.get(absolutePath).json.policies, policies.body);
     } catch (error) {
       assert.fail(error);
     }
