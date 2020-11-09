@@ -1,6 +1,7 @@
 /// <reference path="../../index.d.ts" />
 const axios = require('axios');
 const { Methods } = require('http-headers-js');
+const clients = require('../fixtures/clients');
 const { DEFAULT_HEADERS } = require('../../src/helpers/XHR');
 
 module.exports = async (BASE_URL) => {
@@ -13,8 +14,8 @@ module.exports = async (BASE_URL) => {
       credentials: 'same-origin',
       headers: DEFAULT_HEADERS,
       data: JSON.stringify({
-        username: process.env.PUBLIC_API_ID,
-        password: process.env.PUBLIC_API_SECRET
+        username: clients.body[0].email,
+        password: ''
       })
     });
     return response.data.token;

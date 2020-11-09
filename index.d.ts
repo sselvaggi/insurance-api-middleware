@@ -1,8 +1,14 @@
+export interface SessionRequest extends Express.Request {
+  session: Client
+}
+
+export type ClientRole = 'admin' | 'user'
+
 export interface Client {
   id: string
   name: string
   email: string
-  role: string
+  role: ClientRole
 }
 
 export interface Credential {

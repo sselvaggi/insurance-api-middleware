@@ -1,3 +1,4 @@
+/// <reference path="../../index.d.ts" />
 module.exports.headers = {
   'cache-control': 'private',
   connection: 'keep-alive',
@@ -10,7 +11,7 @@ module.exports.headers = {
   via: '1.1 vegur'
 };
 
-module.exports.body = [
+module.exports.body = /** @type {Insurance.Policy[]} */([
   {
     id: '64cceef9-3a01-49ae-a23b-3761b604800b',
     amountInsured: '1825.89',
@@ -1555,4 +1556,4 @@ module.exports.body = [
     installmentPayment: true,
     clientId: 'e8fd159b-57c4-4d36-9bd7-a59ca13057bb'
   }
-];
+]);
