@@ -10,6 +10,7 @@ const FAKE_SERVER = require('../fixtures/server');
 const login = require('../helpers/login');
 const clients = require('../fixtures/clients');
 const policies = require('../fixtures/policies');
+const { serializeClientPolicy, serializeClient, serializePolicy } = require('../../src/helpers/responses');
 
 const PORT = process.env.PORT || 3000;
 const CLIENT_ID = clients.body[1].id;
@@ -63,8 +64,8 @@ describe('API Test', () => {
           authorization: `Bearer ${token}`
         }
       }));
-      assert.deepStrictEqual(response.data.clients.length, 10);
-      assert.deepStrictEqual(response.data.clients, clients.body.slice(0, 10));
+      assert.deepStrictEqual(response.data.length, 10);
+      assert.deepStrictEqual(response.data, clients.body.slice(0, 10).map(serializeClient));
     } catch (error) {
       assert.fail(error);
     }
@@ -80,8 +81,8 @@ describe('API Test', () => {
           authorization: `Bearer ${token}`
         }
       }));
-      assert.deepStrictEqual(response.data.clients.length, 50);
-      assert.deepStrictEqual(response.data.clients, clients.body.slice(0, 50));
+      assert.deepStrictEqual(response.data.length, 50);
+      assert.deepStrictEqual(response.data, clients.body.slice(0, 50).map(serializeClient));
     } catch (error) {
       assert.fail(error);
     }
@@ -97,8 +98,8 @@ describe('API Test', () => {
           authorization: `Bearer ${token}`
         }
       }));
-      assert.deepStrictEqual(response.data.clients.length, 50);
-      assert.deepStrictEqual(response.data.clients, clients.body.slice(50, 100));
+      assert.deepStrictEqual(response.data.length, 50);
+      assert.deepStrictEqual(response.data, clients.body.slice(50, 100).map(serializeClient));
     } catch (error) {
       assert.fail(error);
     }
@@ -114,7 +115,7 @@ describe('API Test', () => {
           authorization: `Bearer ${token}`
         }
       }));
-      assert.deepStrictEqual(response.data.clients[0].name, 'Johns');
+      assert.deepStrictEqual(response.data[0].name, 'Johns');
     } catch (error) {
       assert.fail(error);
     }
@@ -130,7 +131,7 @@ describe('API Test', () => {
           authorization: `Bearer ${token}`
         }
       }));
-      assert.deepStrictEqual(response.data.client, clients.body[1]);
+      assert.deepStrictEqual(response.data, serializeClient(clients.body[1]));
     } catch (error) {
       assert.fail(error);
     }
@@ -146,8 +147,8 @@ describe('API Test', () => {
           authorization: `Bearer ${token}`
         }
       }));
-      assert.deepStrictEqual(response.data.policies.length, 10);
-      assert.deepStrictEqual(response.data.policies, policies.body.slice(0, 10));
+      assert.deepStrictEqual(response.data.length, 10);
+      assert.deepStrictEqual(response.data, policies.body.slice(0, 10).map(serializePolicy));
     } catch (error) {
       assert.fail(error);
     }
@@ -163,8 +164,8 @@ describe('API Test', () => {
           authorization: `Bearer ${token}`
         }
       }));
-      assert.deepStrictEqual(response.data.policies.length, 50);
-      assert.deepStrictEqual(response.data.policies, policies.body.slice(0, 50));
+      assert.deepStrictEqual(response.data.length, 50);
+      assert.deepStrictEqual(response.data, policies.body.slice(0, 50).map(serializePolicy));
     } catch (error) {
       assert.fail(error);
     }
@@ -180,8 +181,8 @@ describe('API Test', () => {
           authorization: `Bearer ${token}`
         }
       }));
-      assert.deepStrictEqual(response.data.policies.length, 50);
-      assert.deepStrictEqual(response.data.policies, policies.body.slice(50, 100));
+      assert.deepStrictEqual(response.data.length, 50);
+      assert.deepStrictEqual(response.data, policies.body.slice(50, 100).map(serializePolicy));
     } catch (error) {
       assert.fail(error);
     }
@@ -197,7 +198,7 @@ describe('API Test', () => {
           authorization: `Bearer ${token}`
         }
       }));
-      assert.deepStrictEqual(response.data.policy, policies.body[1]);
+      assert.deepStrictEqual(response.data, serializePolicy(policies.body[1]));
     } catch (error) {
       assert.fail(error);
     }
@@ -213,7 +214,7 @@ describe('API Test', () => {
           authorization: `Bearer ${token}`
         }
       }));
-      assert.deepStrictEqual(response.data.policies.length, 91);
+      assert.deepStrictEqual(response.data.length, 91);
     } catch (error) {
       assert.fail(error);
     }
